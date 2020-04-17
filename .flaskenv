@@ -1,0 +1,2 @@
+FLASK_APP=slackwolf
+FLASK_ENV=development
