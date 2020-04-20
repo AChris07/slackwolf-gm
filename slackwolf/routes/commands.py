@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from slackwolf.api import get_game, create_new_game
 from slackwolf.models import User
+from slackwolf.models.Game import GameStatus
 
 from operator import itemgetter
 
@@ -16,6 +17,7 @@ def join_game():
 
     - Will list all the users currently waiting in the lobby
     for a game to start.
+    - Will fail and inform the user if he already joined.
     - Will fail and inform the user if a game is already underway.
     - Will also fail and inform the user if he sends the command via DM
     without specifying a channel.
@@ -31,6 +33,10 @@ def join_game():
     if current_game is None:
         create_new_game(team_data, channel_data, user_data)
         return f"Welcome to the game lobby! Users: @{user_data[0]}", 200
+    elif current_game.users.get(user_data[0]):
+        return f"You've already joined @{user_data[0]}!", 200
+    elif current_game.status is GameStatus.STARTED:
+        return "Sorry, a game is already in progress on this channel", 200
     else:
         new_user = User(*user_data)
         current_game.users[new_user.id] = new_user
