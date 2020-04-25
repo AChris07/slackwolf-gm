@@ -2,7 +2,6 @@ import pytest
 
 from slackwolf import create_app
 import slackwolf.api.game_manager as game_manager
-from slackwolf.models import Team, Channel, Game, User
 
 
 @pytest.fixture
@@ -25,16 +24,12 @@ def reset_game_store():
 
 @pytest.fixture
 def mock_game_store(monkeypatch) -> dict:
-    mock_game_store = {}
-    mock_team = Team("mock-team-id", "Mock Team")
-    mock_channel = Channel("mock-channel-id", "Mock Channel")
-    mock_user = User("mock-user-id", "Mock User")
-    mock_game = Game()
+    game_manager.create_new_game(
+        ("mock-team-id", "Mock Team"),
+        ("mock-channel-id", "Mock Channel"),
+        ("mock-user-id", "Mock User")
+    )
 
-    mock_game.users[mock_user.id] = mock_user
-    mock_channel.game = mock_game
-    mock_team.channels[mock_channel.id] = mock_channel
-    mock_game_store[mock_team.id] = mock_team
-
+    mock_game_store = game_manager.game_store.copy()
     monkeypatch.setattr(game_manager, "game_store", mock_game_store)
     return mock_game_store

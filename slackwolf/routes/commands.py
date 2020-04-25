@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from slackwolf.api import get_game, create_new_game
-from slackwolf.models import User
-from slackwolf.models.Game import GameStatus
+from slackwolf.api.entities import User
+from slackwolf.api.entities.game import GameStatus
 from slackwolf.routes.response import Response
 
 from operator import itemgetter
@@ -34,7 +34,7 @@ def join_game():
     if current_game is None:
         create_new_game(team_data, channel_data, user_data)
         return Response(f"Game lobby updated: @{user_data[0]}").as_public()
-    elif current_game.users.get(user_data[0]):
+    elif user_data[0] in [x.id for x in current_game.users]:
         return Response(
             f"You've already joined, @{user_data[0]}!"
         ).as_ephimeral()
@@ -44,8 +44,8 @@ def join_game():
         ).as_ephimeral()
     else:
         new_user = User(*user_data)
-        current_game.users[new_user.id] = new_user
-        users_list = [f"@{user.id}" for user in current_game.users.values()]
+        current_game.users.append(new_user)
+        users_list = [f"@{user.id}" for user in current_game.users]
         return Response(
             f"Game lobby updated: {','.join(users_list)}"
         ).as_public()
@@ -69,7 +69,8 @@ def leave_game():
     team_id, channel_id, user_id = \
         itemgetter('team_id', 'channel_id', 'user_id')(request.form)
     current_game = get_game(team_id, channel_id)
-    if current_game is None or not current_game.users.get(user_id):
+    users_id = current_game and [x.id for x in current_game.users]
+    if current_game is None or user_id not in users_id:
         return Response(
             "You haven't joined the current game lobby yet!"
         ).as_ephimeral()
@@ -78,8 +79,9 @@ def leave_game():
             "Sorry, cannot leave a game currently in progress"
         ).as_ephimeral()
     else:
-        current_game.users.pop(user_id, None)
-        users_list = [f"@{user.id}" for user in current_game.users.values()]
+        new_users = [x for x in current_game.users if not x.id == user_id]
+        current_game.users = new_users
+        users_list = [f"@{user.id}" for user in current_game.users]
         if len(users_list):
             msg = f"Game lobby updated: {','.join(users_list)}"
         else:

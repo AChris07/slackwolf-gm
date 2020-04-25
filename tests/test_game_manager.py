@@ -9,5 +9,5 @@ class TestGetGame:
     def test_game_found(self, mock_game_store):
         game = get_game("mock-team-id", "mock-channel-id")
         mock_game = mock_game_store['mock-team-id']\
-            .channels['mock-channel-id'].game
+            .channels[0].game
         assert game is mock_game

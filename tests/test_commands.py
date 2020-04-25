@@ -1,6 +1,6 @@
 import slackwolf.api.game_manager as game_manager
-from slackwolf.models.Game import GameStatus
-from slackwolf.models import User
+from slackwolf.api.entities.game import GameStatus
+from slackwolf.api.entities import User
 
 
 def join_game(client, data):
@@ -31,10 +31,9 @@ class TestJoinGame:
         data = rv.get_json()
         assert data['response_type'] == 'in_channel'
         assert data['text'] == 'Game lobby updated: @mock-user-id'
-        created_game = store['mock-team-id']\
-            .channels['mock-channel-id'].game
+        created_game = store['mock-team-id'].channels[0].game
         assert created_game is not None
-        assert len(created_game.users.keys()) == 1
+        assert len(created_game.users) == 1
 
     def test_game_exists_joined(self, client, mock_game_store):
         data = dict(self.data)
@@ -58,7 +57,7 @@ class TestJoinGame:
         assert data['text'] == 'You\'ve already joined, @mock-user-id!'
 
     def test_game_underway(self, client, mock_game_store):
-        game = mock_game_store['mock-team-id'].channels['mock-channel-id'].game
+        game = mock_game_store['mock-team-id'].channels[0].game
         game.status = GameStatus.STARTED
 
         data = dict(self.data)
@@ -94,8 +93,8 @@ class TestLeaveGame:
 
     def test_game_left_not_last(self, client, mock_game_store):
         user = User('mock-user-id-2', 'Mock User 2')
-        game = mock_game_store['mock-team-id'].channels['mock-channel-id'].game
-        game.users[user.id] = user
+        game = mock_game_store['mock-team-id'].channels[0].game
+        game.users.append(user)
 
         rv = leave_game(client, self.data)
 
@@ -114,7 +113,7 @@ class TestLeaveGame:
             'the current game lobby yet!'
 
     def test_game_underway(self, client, mock_game_store):
-        game = mock_game_store['mock-team-id'].channels['mock-channel-id'].game
+        game = mock_game_store['mock-team-id'].channels[0].game
         game.status = GameStatus.STARTED
 
         rv = leave_game(client, self.data)

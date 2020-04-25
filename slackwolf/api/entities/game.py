@@ -8,8 +8,8 @@ class GameStatus(Enum):
 
 
 class Game:
-    """Game model"""
+    """Game entity"""
 
     def __init__(self):
-        self.users = {}
+        self.users = []
         self.status = GameStatus.WAITING
