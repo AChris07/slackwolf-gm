@@ -1,6 +1,7 @@
-import slackwolf.api.game_manager as game_manager
-from slackwolf.api.entities.game import GameStatus
-from slackwolf.api.entities import User
+from slackwolf.api import game_manager
+from slackwolf.db.entities import GameUser, User
+from slackwolf.db.entities.game import GameStatus
+from tests import fixtures
 
 
 def join_game(client, data):
@@ -18,27 +19,23 @@ class TestJoinGame:
         'channel_id': "mock-channel-id",
         'channel_name': "Mock Channel",
         'user_id': "mock-user-id",
-        'user_name': "Mock User"
+        'user_name': "mockuser"
     }
 
-    def test_game_created(self, client):
-        store = game_manager.game_store
-        assert store == {}
+    def test_game_created(self, client, monkeypatch):
+        monkeypatch.setattr(game_manager, "get_game", lambda *_: None)
 
         rv = join_game(client, self.data)
 
         assert rv.status_code == 200
         data = rv.get_json()
         assert data['response_type'] == 'in_channel'
-        assert data['text'] == 'Game lobby updated: @mock-user-id'
-        created_game = store['mock-team-id'].channels[0].game
-        assert created_game is not None
-        assert len(created_game.users) == 1
+        assert data['text'] == 'Game lobby updated: @mockuser'
 
-    def test_game_exists_joined(self, client, mock_game_store):
+    def test_game_exists_joined(self, client):
         data = dict(self.data)
         data['user_id'] = "mock-user-id-2"
-        data['user_name'] = "Mock User 2"
+        data['user_name'] = "mockuser2"
 
         rv = join_game(client, data)
 
@@ -46,23 +43,24 @@ class TestJoinGame:
         data = rv.get_json()
         assert data['response_type'] == 'in_channel'
         assert data['text'] == 'Game lobby updated: ' \
-            '@mock-user-id,@mock-user-id-2'
+            '@mockuser,@mockuser2'
 
-    def test_user_already_joined(self, client, mock_game_store):
+    def test_user_already_joined(self, client):
         rv = join_game(client, self.data)
 
         assert rv.status_code == 200
         data = rv.get_json()
         assert data['response_type'] == 'ephimeral'
-        assert data['text'] == 'You\'ve already joined, @mock-user-id!'
+        assert data['text'] == 'You\'ve already joined, @mockuser!'
 
-    def test_game_underway(self, client, mock_game_store):
-        game = mock_game_store['mock-team-id'].channels[0].game
-        game.status = GameStatus.STARTED
+    def test_game_underway(self, client, monkeypatch):
+        mock_game = fixtures.get_mock_game()
+        mock_game.status = GameStatus.STARTED
+        monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
         data = dict(self.data)
         data['user_id'] = "mock-user-id-2"
-        data['user_name'] = "Mock User 2"
+        data['user_name'] = "mockuser2"
 
         rv = join_game(client, data)
 
@@ -80,10 +78,10 @@ class TestLeaveGame:
         'channel_id': "mock-channel-id",
         'channel_name': "Mock Channel",
         'user_id': "mock-user-id",
-        'user_name': "Mock User"
+        'user_name': "mockuser"
     }
 
-    def test_game_left_last(self, client, mock_game_store):
+    def test_game_left_last(self, client):
         rv = leave_game(client, self.data)
 
         assert rv.status_code == 200
@@ -91,20 +89,25 @@ class TestLeaveGame:
         assert data['response_type'] == 'in_channel'
         assert data['text'] == 'Game lobby is empty'
 
-    def test_game_left_not_last(self, client, mock_game_store):
-        user = User('mock-user-id-2', 'Mock User 2')
-        game = mock_game_store['mock-team-id'].channels[0].game
-        game.users.append(user)
+    def test_game_left_not_last(self, client, monkeypatch):
+        mock_game = fixtures.get_mock_game()
+        user = User(slack_id='mock-user-id-2', username='mockuser2')
+        mock_game.users.append(GameUser(user=user))
+        monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
         rv = leave_game(client, self.data)
 
         assert rv.status_code == 200
         data = rv.get_json()
         assert data['response_type'] == 'in_channel'
-        assert data['text'] == 'Game lobby updated: @mock-user-id-2'
+        assert data['text'] == 'Game lobby updated: @mockuser2'
 
     def test_game_already_left(self, client):
-        rv = leave_game(client, self.data)
+        data = dict(self.data)
+        data['user_id'] = "mock-user-id-2"
+        data['user_name'] = "mockuser2"
+
+        rv = leave_game(client, data)
 
         assert rv.status_code == 200
         data = rv.get_json()
@@ -112,9 +115,10 @@ class TestLeaveGame:
         assert data['text'] == 'You haven\'t joined ' \
             'the current game lobby yet!'
 
-    def test_game_underway(self, client, mock_game_store):
-        game = mock_game_store['mock-team-id'].channels[0].game
-        game.status = GameStatus.STARTED
+    def test_game_underway(self, client, monkeypatch):
+        mock_game = fixtures.get_mock_game()
+        mock_game.status = GameStatus.STARTED
+        monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
         rv = leave_game(client, self.data)
 

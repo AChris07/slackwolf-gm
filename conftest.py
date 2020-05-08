@@ -1,12 +1,17 @@
 import pytest
 
 from slackwolf import create_app
-import slackwolf.api.game_manager as game_manager
+from slackwolf.api import game_manager
+from slackwolf.db.entities import User, GameUser
+from tests import fixtures
 
 
 @pytest.fixture
 def app():
-    app = create_app({'TESTING': True})
+    app = create_app({
+        'TESTING': True,
+        'DATABASE_URL': 'sqlite:///test.db'
+    })
     yield app
 
 
@@ -16,20 +21,22 @@ def client(app):
 
 
 @pytest.fixture(autouse=True)
-def reset_game_store():
-    initial_game_store = dict(game_manager.game_store)
-    yield
-    game_manager.game_store = initial_game_store
+def mock_game_manager(monkeypatch):
+    monkeypatch.setattr(game_manager,
+                        "get_game",
+                        lambda *_: fixtures.get_mock_game())
 
+    monkeypatch.setattr(game_manager, "create_new_game", lambda *_: None)
 
-@pytest.fixture
-def mock_game_store(monkeypatch) -> dict:
-    game_manager.create_new_game(
-        ("mock-team-id", "Mock Team"),
-        ("mock-channel-id", "Mock Channel"),
-        ("mock-user-id", "Mock User")
-    )
+    def mock_join_game(user_data, game):
+        id, name = user_data
+        user = User(slack_id=id, username=name)
+        game.users.append(GameUser(user=user))
 
-    mock_game_store = game_manager.game_store.copy()
-    monkeypatch.setattr(game_manager, "game_store", mock_game_store)
-    return mock_game_store
+    monkeypatch.setattr(game_manager, "join_game_lobby", mock_join_game)
+
+    def mock_leave_game(team_id, user_id, game):
+        new_game_users = [x for x in game.users if x.user.slack_id != user_id]
+        game.users = new_game_users
+
+    monkeypatch.setattr(game_manager, "leave_game_lobby", mock_leave_game)

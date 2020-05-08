@@ -1,31 +1,36 @@
 from typing import Tuple
-from slackwolf.api.entities import Team, Channel, Game, User
+from slackwolf.api.dao import ChannelDao, GameDao, TeamDao, UserDao
+from slackwolf.db.entities import Game, GameUser
 
 TeamIdentity = Tuple[str, str]
 ChannelIdentity = Tuple[str, str]
 UserIdentity = Tuple[str, str]
 
-game_store = {}
-
 
 def get_game(team_id: str, channel_id: str) -> Game:
-    team = game_store.get(team_id, Team()) or Team()
-    team_channels = team.channels
-    channel = next((x for x in team_channels if x.id == channel_id), Channel())
-    return channel.game
+    channel = ChannelDao().find_by_sid(team_id, channel_id)
+    return channel and channel.game
 
 
 def create_new_game(team_data: TeamIdentity,
                     channel_data: ChannelIdentity,
                     user_data: UserIdentity) -> None:
-    new_game = Game()
-    new_game.users.append(User(*user_data))
-    # TODO: Refactor this
-    if not game_store.get(team_data[0]):
-        game_store[team_data[0]] = Team(*team_data)
-    channels = game_store[team_data[0]].channels
-    channel = next((x for x in channels if x.id == channel_data[0]), None)
-    if not channel:
-        channel = Channel(*channel_data)
-        channels.append(channel)
-    channel.game = new_game
+    TeamDao().get_or_create_by_sid(*team_data)
+    channel = ChannelDao().get_or_create_by_sid(team_data[0], *channel_data)
+    user = UserDao().get_or_create_by_sid(team_data[0], *user_data)
+
+    game = Game(channel=channel, users=[GameUser(user=user)])
+    GameDao().save(game)
+
+
+def join_game_lobby(user_data: UserIdentity, game: Game) -> None:
+    team_sid = game.channel.team.slack_id
+    user = UserDao().get_or_create_by_sid(team_sid, *user_data)
+
+    GameDao().add_user(game, user)
+
+
+def leave_game_lobby(team_id: str, user_id: str, game: Game) -> None:
+    user = UserDao().find_by_sid(team_id, user_id)
+    if user:
+        GameDao().remove_user(game, user)
