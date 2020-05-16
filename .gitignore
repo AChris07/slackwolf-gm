@@ -58,3 +58,6 @@ cover/
 # Flask stuff:
 instance/
 .webassets-cache
+
+# Test databases
+*.db
