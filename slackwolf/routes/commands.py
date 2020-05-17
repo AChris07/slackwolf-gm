@@ -81,7 +81,7 @@ def leave_game():
             "Sorry, cannot leave a game currently in progress"
         ).as_ephimeral()
     else:
-        game_manager.leave_game_lobby(team_id, user_id, current_game)
+        game_manager.leave_game_lobby(user_id, current_game)
         users_list = [f"@{x.user.username}" for x in current_game.users]
         if len(users_list):
             msg = f"Game lobby updated: {','.join(users_list)}"

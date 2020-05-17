@@ -12,6 +12,7 @@ flake8 = "*"
 pytest = "*"
 sqlalchemy = "*"
 alembic = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.8"

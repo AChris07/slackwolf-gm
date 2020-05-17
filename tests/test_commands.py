@@ -1,3 +1,4 @@
+import pytest
 from slackwolf.api import game_manager
 from slackwolf.db.entities import GameUser, User
 from slackwolf.db.entities.game import GameStatus
@@ -12,6 +13,7 @@ def leave_game(client, data):
     return client.post('/api/v1/commands/leave', data=data)
 
 
+@pytest.mark.usefixtures("mock_game_manager")
 class TestJoinGame:
     data = {
         'team_id': "mock-team-id",
@@ -71,6 +73,7 @@ class TestJoinGame:
             'on this channel'
 
 
+@pytest.mark.usefixtures("mock_game_manager")
 class TestLeaveGame:
     data = {
         'team_id': "mock-team-id",

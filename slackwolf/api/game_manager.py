@@ -30,7 +30,8 @@ def join_game_lobby(user_data: UserIdentity, game: Game) -> None:
     GameDao().add_user(game, user)
 
 
-def leave_game_lobby(team_id: str, user_id: str, game: Game) -> None:
-    user = UserDao().find_by_sid(team_id, user_id)
+def leave_game_lobby(user_id: str, game: Game) -> None:
+    team_sid = game.channel.team.slack_id
+    user = UserDao().find_by_sid(team_sid, user_id)
     if user:
         GameDao().remove_user(game, user)

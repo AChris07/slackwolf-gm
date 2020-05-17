@@ -20,7 +20,7 @@ def client(app):
     return app.test_client()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def mock_game_manager(monkeypatch):
     monkeypatch.setattr(game_manager,
                         "get_game",
@@ -35,8 +35,16 @@ def mock_game_manager(monkeypatch):
 
     monkeypatch.setattr(game_manager, "join_game_lobby", mock_join_game)
 
-    def mock_leave_game(team_id, user_id, game):
+    def mock_leave_game(user_id, game):
         new_game_users = [x for x in game.users if x.user.slack_id != user_id]
         game.users = new_game_users
 
     monkeypatch.setattr(game_manager, "leave_game_lobby", mock_leave_game)
+
+
+@pytest.fixture(autouse=True)
+def mock_daos(mocker):
+    mocker.patch('slackwolf.api.dao.ChannelDao')
+    mocker.patch('slackwolf.api.dao.GameDao')
+    mocker.patch('slackwolf.api.dao.TeamDao')
+    mocker.patch('slackwolf.api.dao.UserDao')
