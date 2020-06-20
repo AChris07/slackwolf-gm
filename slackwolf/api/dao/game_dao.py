@@ -2,6 +2,7 @@ from typing import List
 
 import slackwolf.db as db
 from slackwolf.db.entities import Game, GameUser, User
+from slackwolf.roles import RoleTypes
 
 
 class GameDao:
@@ -37,4 +38,11 @@ class GameDao:
             filter(GameUser.user_id == user.id).\
             first()
         self.__session.delete(game_user)
+        self.__session.commit()
+
+    def assign_role(self, game: Game, user: User, role: RoleTypes) -> None:
+        self.__session.query(GameUser).\
+            filter(GameUser.game_id == game.id).\
+            filter(GameUser.user_id == user.id).\
+            update(role=role)
         self.__session.commit()

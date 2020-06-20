@@ -1,8 +1,10 @@
 import pytest
 
 from slackwolf import create_app
-from slackwolf.api import game_manager
+from slackwolf.api import game_manager, slack
 from slackwolf.db.entities import User, GameUser
+from slackwolf.db.entities.game import GameStatus
+from slackwolf.roles import RoleTypes
 from tests import fixtures
 
 
@@ -41,6 +43,12 @@ def mock_game_manager(monkeypatch):
 
     monkeypatch.setattr(game_manager, "leave_game_lobby", mock_leave_game)
 
+    def mock_start_game(game):
+        game.status = GameStatus.STARTED
+        game.users[0].role = RoleTypes.SEER
+
+    monkeypatch.setattr(game_manager, "start_game", mock_start_game)
+
 
 @pytest.fixture(autouse=True)
 def mock_daos(mocker):
@@ -48,3 +56,11 @@ def mock_daos(mocker):
     mocker.patch('slackwolf.api.dao.GameDao')
     mocker.patch('slackwolf.api.dao.TeamDao')
     mocker.patch('slackwolf.api.dao.UserDao')
+
+
+@pytest.fixture(autouse=True)
+def mock_slack_api(monkeypatch):
+    monkeypatch.setattr(slack,
+                        "get_users_list",
+                        lambda *_: fixtures.get_mock_slack_users_data())
+    monkeypatch.setattr(slack, "post_message", lambda *_: None)

@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from slackwolf.api import game_manager
+from slackwolf.api import game_manager, slack
 from slackwolf.db.entities.game import GameStatus
 from slackwolf.routes.response import Response
 
@@ -72,6 +72,7 @@ def leave_game():
         itemgetter('team_id', 'channel_id', 'user_id')(request.form)
     current_game = game_manager.get_game(team_id, channel_id)
     users_id = current_game and [x.user.slack_id for x in current_game.users]
+
     if current_game is None or user_id not in users_id:
         return Response(
             "You haven't joined the current game lobby yet!"
@@ -88,3 +89,48 @@ def leave_game():
         else:
             msg = "Game lobby is empty"
         return Response(msg).as_public()
+
+
+@bp.route('/start', methods=['POST'])
+def start_game():
+    """Starts a game lobby.
+
+    Triggers the bot to start the game lobby in the current channel.
+
+    - Will publicly list the users present, and start the game.
+    - Will assign roles to every participant, and send them a message
+      with the details of their role.
+    - Will fail and inform the user if he's not part of the game lobby.
+    - Will fail and inform the user if a game is already underway.
+
+    TODO: Check if we can send a channel as argument and pick up the ID
+
+    """
+    team_id, channel_id, user_id = \
+        itemgetter('team_id', 'channel_id', 'user_id')(request.form)
+    current_game = game_manager.get_game(team_id, channel_id)
+    users_id = current_game and [x.user.slack_id for x in current_game.users]
+
+    if current_game is None or user_id not in users_id:
+        return Response(
+            "You haven't joined the current game lobby yet!"
+        ).as_ephimeral()
+    elif current_game.status is GameStatus.STARTED:
+        return Response(
+            "The game has already started!"
+        ).as_ephimeral()
+    else:
+        game_manager.start_game(current_game)
+
+        for game_user in current_game.users:
+            users_data = slack.get_users_list()
+            user_sid = game_user.user.slack_id
+            user_data = next(x for x in users_data if x['user'] == user_sid)
+
+            msg = f"Your new role is {game_user.role.value}. " \
+                "Type /swhelp if you need more information."
+            slack.post_message(user_data['id'], msg)
+
+        return Response(
+            "Dummy response. Game started!"
+        ).as_public()

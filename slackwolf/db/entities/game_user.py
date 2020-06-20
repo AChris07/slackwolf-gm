@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 
 from slackwolf.db import Base
+from slackwolf.roles import RoleTypes
 
 
 class GameUser(Base):
@@ -11,3 +12,4 @@ class GameUser(Base):
     user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
     game = relationship('Game', back_populates='users')
     user = relationship('User', back_populates='games')
+    role = Column(Enum(RoleTypes), default=RoleTypes.VILLAGER, nullable=False)

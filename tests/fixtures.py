@@ -28,3 +28,16 @@ def get_mock_game():
 
     return Game(channel=mock_channel,
                 users=[GameUser(user=mock_user)])
+
+
+def get_mock_slack_users_data():
+    return [{
+        "id": "mock-user-im-id",
+        "created": 1587093834,
+        "is_archived": False,
+        "is_im": True,
+        "is_org_shared": False,
+        "user": "mock-user-id",
+        "is_user_deleted": False,
+        "priority": 0
+    }]

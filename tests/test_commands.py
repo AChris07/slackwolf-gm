@@ -13,6 +13,10 @@ def leave_game(client, data):
     return client.post('/api/v1/commands/leave', data=data)
 
 
+def start_game(client, data):
+    return client.post('/api/v1/commands/start', data=data)
+
+
 @pytest.mark.usefixtures("mock_game_manager")
 class TestJoinGame:
     data = {
@@ -130,3 +134,70 @@ class TestLeaveGame:
         assert data['response_type'] == 'ephimeral'
         assert data['text'] == 'Sorry, cannot leave a game ' \
             'currently in progress'
+
+
+@pytest.mark.usefixtures("mock_game_manager")
+class TestStartGame:
+    data = {
+        'team_id': "mock-team-id",
+        'team_domain': "Mock Team",
+        'channel_id': "mock-channel-id",
+        'channel_name': "Mock Channel",
+        'user_id': "mock-user-id",
+        'user_name': "mockuser"
+    }
+
+    def test_game_started(self, client, monkeypatch, mocker):
+        mock_game = fixtures.get_mock_game()
+        monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
+        post_message = mocker.patch('slackwolf.api.slack.post_message')
+
+        rv = start_game(client, self.data)
+
+        assert mock_game.status == GameStatus.STARTED
+        assert rv.status_code == 200
+        data = rv.get_json()
+        assert data['response_type'] == 'in_channel'
+        assert data['text'] == 'Dummy response. Game started!'
+
+        user_im_id = fixtures.get_mock_slack_users_data()[0]['id']
+        post_message.assert_called_once_with(user_im_id,
+                                             'Your new role is Seer. '
+                                             'Type /swhelp if you need more information.'
+                                             )
+
+    def test_game_start_without_join(self, client):
+        data = dict(self.data)
+        data['user_id'] = "mock-user-id-2"
+        data['user_name'] = "mockuser2"
+
+        rv = start_game(client, data)
+
+        assert rv.status_code == 200
+        data = rv.get_json()
+        assert data['response_type'] == 'ephimeral'
+        assert data['text'] == 'You haven\'t joined ' \
+            'the current game lobby yet!'
+
+    def test_game_start_without_game(self, client, monkeypatch):
+        monkeypatch.setattr(game_manager, "get_game", lambda *_: None)
+
+        rv = start_game(client, self.data)
+
+        assert rv.status_code == 200
+        data = rv.get_json()
+        assert data['response_type'] == 'ephimeral'
+        assert data['text'] == 'You haven\'t joined ' \
+            'the current game lobby yet!'
+
+    def test_game_underway(self, client, monkeypatch):
+        mock_game = fixtures.get_mock_game()
+        mock_game.status = GameStatus.STARTED
+        monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
+
+        rv = start_game(client, self.data)
+
+        assert rv.status_code == 200
+        data = rv.get_json()
+        assert data['response_type'] == 'ephimeral'
+        assert data['text'] == 'The game has already started!'
