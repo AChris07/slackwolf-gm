@@ -1,5 +1,5 @@
 from slackwolf.api import game_manager
-from tests import fixtures
+from tests import mocks
 
 from slackwolf.db.entities import GameUser
 from slackwolf.db.entities.game import GameStatus
@@ -20,7 +20,7 @@ class TestGetGame:
         assert game is None
 
     def test_channel_without_game(self, mocker):
-        mock_channel = fixtures.get_mock_channel()
+        mock_channel = mocks.get_mock_channel()
         channel_find = mocker.patch(
             'slackwolf.api.game_manager.ChannelDao.find_by_sid'
         )
@@ -31,7 +31,7 @@ class TestGetGame:
         assert game is None
 
     def test_game_found(self, mocker):
-        mock_game = fixtures.get_mock_game()
+        mock_game = mocks.get_mock_game()
         channel_find = mocker.patch(
             'slackwolf.api.game_manager.ChannelDao.find_by_sid'
         )
@@ -48,8 +48,8 @@ class TestCreateNewGame:
     user_data = ('mock-user-id', 'mockuser')
 
     def test_create_new_game(self, mocker):
-        mock_channel = fixtures.get_mock_channel()
-        mock_user = fixtures.get_mock_user()
+        mock_channel = mocks.get_mock_channel()
+        mock_user = mocks.get_mock_user()
 
         team_get_create = mocker.patch(
             'slackwolf.api.game_manager.TeamDao.get_or_create_by_sid'
@@ -88,10 +88,10 @@ class TestCreateNewGame:
 
 class TestJoinGameLobby:
     user_data = ('mock-user-id', 'mockuser')
-    mock_game = fixtures.get_mock_game()
+    mock_game = mocks.get_mock_game()
 
     def test_join_game_lobby(self, mocker):
-        mock_user = fixtures.get_mock_user()
+        mock_user = mocks.get_mock_user()
 
         user_get_create = mocker.patch(
             'slackwolf.api.game_manager.UserDao.get_or_create_by_sid'
@@ -109,10 +109,10 @@ class TestJoinGameLobby:
 class TestLeaveGameLobby:
     mock_team_id = 'mock-team-id'
     mock_user_id = 'mock-user-id'
-    mock_game = fixtures.get_mock_game()
+    mock_game = mocks.get_mock_game()
 
     def test_leave_game_lobby(self, mocker):
-        mock_user = fixtures.get_mock_user()
+        mock_user = mocks.get_mock_user()
 
         find_user = mocker.patch(
             'slackwolf.api.game_manager.UserDao.find_by_sid'
@@ -142,7 +142,7 @@ class TestLeaveGameLobby:
 
 class TestStartGame:
     def test_start_game(self, mocker):
-        mock_game = fixtures.get_mock_game()
+        mock_game = mocks.get_mock_game()
         mock_user = mock_game.users[0].user
 
         assign_role = mocker.patch(
@@ -160,10 +160,10 @@ class TestStartGame:
                                             status=GameStatus.STARTED)
 
     def test_start_game_multiple_roles(self, mocker):
-        mock_game = fixtures.get_mock_game()
+        mock_game = mocks.get_mock_game()
 
         for i in range(6):
-            mock_user = fixtures.get_mock_user()
+            mock_user = mocks.get_mock_user()
             mock_user.username = f"mockuser{i+1}"
             mock_game.users.append(GameUser(user=mock_user))
 
