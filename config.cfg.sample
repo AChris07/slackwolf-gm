@@ -1,0 +1,3 @@
+DATABASE_URL='sqlite:///slackwolf.db'
+SLACK_URL=''
+SLACK_BOT_TOKEN=''
