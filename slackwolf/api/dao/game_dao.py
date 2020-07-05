@@ -44,5 +44,5 @@ class GameDao:
         self.__session.query(GameUser).\
             filter(GameUser.game_id == game.id).\
             filter(GameUser.user_id == user.id).\
-            update(role=role)
+            update({'role': role})
         self.__session.commit()
