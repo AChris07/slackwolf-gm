@@ -44,7 +44,7 @@ def mock_game_manager(monkeypatch):
     monkeypatch.setattr(game_manager, "leave_game_lobby", mock_leave_game)
 
     def mock_start_game(game):
-        game.status = GameStatus.STARTED
+        game.status = GameStatus.STARTING_NIGHT
         game.users[0].role = RoleTypes.SEER
 
     monkeypatch.setattr(game_manager, "start_game", mock_start_game)

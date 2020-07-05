@@ -157,7 +157,7 @@ class TestStartGame:
                                             mock_user,
                                             RoleTypes.SEER)
         update_game.assert_called_once_with(mock_game.id,
-                                            status=GameStatus.STARTED)
+                                            status=GameStatus.STARTING_NIGHT)
 
     def test_start_game_multiple_roles(self, mocker):
         mock_game = mocks.get_mock_game()
@@ -185,4 +185,4 @@ class TestStartGame:
         assert len([x for x in roles_assigned if x == RoleTypes.WEREWOLF]) == 2
 
         update_game.assert_called_once_with(mock_game.id,
-                                            status=GameStatus.STARTED)
+                                            status=GameStatus.STARTING_NIGHT)

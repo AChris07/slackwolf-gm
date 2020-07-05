@@ -3,6 +3,7 @@ from slackwolf.db.entities import Channel,\
     GameUser,\
     Team,\
     User
+from slackwolf.db.entities.game import GameStatus
 
 
 def get_mock_channel():
@@ -27,7 +28,8 @@ def get_mock_game():
     mock_user = get_mock_user()
 
     return Game(channel=mock_channel,
-                users=[GameUser(user=mock_user)])
+                users=[GameUser(user=mock_user)],
+                status=GameStatus.WAITING)
 
 
 def get_mock_slack_users_data():

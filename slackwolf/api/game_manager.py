@@ -116,4 +116,4 @@ def start_game(game: Game) -> None:
     for user, role in zip(users, game_roles):
         game_dao.assign_role(game, user, role)
 
-    game_dao.update(game.id, status=GameStatus.STARTED)
+    game_dao.update(game.id, status=GameStatus.STARTING_NIGHT)

@@ -39,7 +39,7 @@ def join_game():
         return Response(
             f"You've already joined, @{user_data[1]}!"
         ).as_ephimeral()
-    elif current_game.status is GameStatus.STARTED:
+    elif current_game.status is not GameStatus.WAITING:
         return Response(
             "Sorry, a game is already in progress on this channel"
         ).as_ephimeral()
@@ -77,7 +77,7 @@ def leave_game():
         return Response(
             "You haven't joined the current game lobby yet!"
         ).as_ephimeral()
-    elif current_game.status is GameStatus.STARTED:
+    elif current_game.status is not GameStatus.WAITING:
         return Response(
             "Sorry, cannot leave a game currently in progress"
         ).as_ephimeral()
@@ -115,7 +115,7 @@ def start_game():
         return Response(
             "You haven't joined the current game lobby yet!"
         ).as_ephimeral()
-    elif current_game.status is GameStatus.STARTED:
+    elif current_game.status is not GameStatus.WAITING:
         return Response(
             "The game has already started!"
         ).as_ephimeral()

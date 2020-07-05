@@ -61,7 +61,7 @@ class TestJoinGame:
 
     def test_game_underway(self, client, monkeypatch):
         mock_game = mocks.get_mock_game()
-        mock_game.status = GameStatus.STARTED
+        mock_game.status = GameStatus.STARTING_NIGHT
         monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
         data = dict(self.data)
@@ -124,7 +124,7 @@ class TestLeaveGame:
 
     def test_game_underway(self, client, monkeypatch):
         mock_game = mocks.get_mock_game()
-        mock_game.status = GameStatus.STARTED
+        mock_game.status = GameStatus.STARTING_NIGHT
         monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
         rv = leave_game(client, self.data)
@@ -154,7 +154,7 @@ class TestStartGame:
 
         rv = start_game(client, self.data)
 
-        assert mock_game.status == GameStatus.STARTED
+        assert mock_game.status == GameStatus.STARTING_NIGHT
         assert rv.status_code == 200
         data = rv.get_json()
         assert data['response_type'] == 'in_channel'
@@ -192,7 +192,7 @@ class TestStartGame:
 
     def test_game_underway(self, client, monkeypatch):
         mock_game = mocks.get_mock_game()
-        mock_game.status = GameStatus.STARTED
+        mock_game.status = GameStatus.STARTING_NIGHT
         monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
         rv = start_game(client, self.data)

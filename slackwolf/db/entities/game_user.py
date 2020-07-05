@@ -6,6 +6,8 @@ from slackwolf.roles import RoleTypes
 
 
 class GameUser(Base):
+    """Game-User association entity"""
+
     __tablename__ = 'game_user'
 
     game_id = Column(Integer, ForeignKey('game.id'), primary_key=True)

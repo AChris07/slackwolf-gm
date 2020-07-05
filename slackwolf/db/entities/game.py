@@ -7,8 +7,10 @@ from slackwolf.db import Base
 
 class GameStatus(enum.Enum):
     WAITING = 1
-    STARTED = 2
-    FINISHED = 3
+    STARTING_NIGHT = 2
+    DAY = 3
+    NIGHT = 4
+    FINISHED = 5
 
 
 class Game(Base):
