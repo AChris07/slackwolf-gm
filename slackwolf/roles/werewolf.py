@@ -5,8 +5,10 @@ class Werewolf:
     name = RoleTypes.WEREWOLF
     team = TeamTypes.WEREWOLVES
 
-    def vote(self):
+    @staticmethod
+    def vote():
         pass
 
-    def kill(self):
+    @staticmethod
+    def kill():
         pass

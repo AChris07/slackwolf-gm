@@ -6,5 +6,6 @@ class Seer(Villager):
     name = RoleTypes.SEER
     max_number = 1
 
-    def see(self):
+    @staticmethod
+    def see():
         pass

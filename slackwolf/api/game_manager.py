@@ -4,7 +4,8 @@ import random
 from slackwolf.api.dao import ChannelDao, GameDao, TeamDao, UserDao
 from slackwolf.db.entities import Game, GameUser
 from slackwolf.db.entities.game import GameStatus
-from slackwolf.roles import RoleTypes, TeamTypes, Villager, Werewolf, roles
+from slackwolf.roles import RoleTypes, TeamTypes, Villager, Werewolf
+from slackwolf.roles.utils import get_role_class
 
 TeamIdentity = Tuple[str, str]
 ChannelIdentity = Tuple[str, str]
@@ -70,6 +71,7 @@ def get_game_roles(game: Game) -> List[RoleTypes]:
     team_count[TeamTypes.VILLAGERS] = num_players - team_count[TeamTypes.WEREWOLVES]
 
     base_roles = [RoleTypes.VILLAGER, RoleTypes.WEREWOLF]
+    roles = [get_role_class(x) for x in RoleTypes]
     result = []
 
     def is_role_available(role):
@@ -88,8 +90,8 @@ def get_game_roles(game: Game) -> List[RoleTypes]:
         # If all other roles have been assigned, look into padding
         # teams with base roles
         if new_role is None:
-            new_role = Werewolf() if team_count[TeamTypes.WEREWOLVES] \
-                else Villager()
+            new_role = Werewolf if team_count[TeamTypes.WEREWOLVES] \
+                else Villager
 
         team_count[new_role.team] -= 1
 

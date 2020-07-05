@@ -5,5 +5,6 @@ class Villager:
     name = RoleTypes.VILLAGER
     team = TeamTypes.VILLAGERS
 
-    def vote(self):
+    @staticmethod
+    def vote():
         pass
