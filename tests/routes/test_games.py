@@ -6,15 +6,15 @@ from tests import mocks
 
 
 def join_game(client, data):
-    return client.post('/api/v1/commands/join', data=data)
+    return client.post('/api/v1/games/join', data=data)
 
 
 def leave_game(client, data):
-    return client.post('/api/v1/commands/leave', data=data)
+    return client.post('/api/v1/games/leave', data=data)
 
 
 def start_game(client, data):
-    return client.post('/api/v1/commands/start', data=data)
+    return client.post('/api/v1/games/start', data=data)
 
 
 @pytest.mark.usefixtures("mock_game_manager")

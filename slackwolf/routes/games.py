@@ -5,7 +5,7 @@ from slackwolf.routes.response import Response
 
 from operator import itemgetter
 
-bp = Blueprint('commands', __name__, url_prefix='/api/v1/commands')
+bp = Blueprint('game_commands', __name__, url_prefix='/api/v1/games')
 
 
 @bp.route('/join', methods=['POST'])
