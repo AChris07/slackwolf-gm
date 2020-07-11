@@ -1,7 +1,7 @@
 from flask import Flask
 
 from slackwolf.db import init_db
-from slackwolf.routes import games
+from slackwolf.routes import games, roles
 
 
 def create_app(test_config=None):
@@ -16,6 +16,7 @@ def create_app(test_config=None):
         app.config.update(test_config)
 
     app.register_blueprint(games.bp)
+    app.register_blueprint(roles.bp)
     init_db(app)
 
     return app

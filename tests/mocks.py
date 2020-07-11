@@ -5,6 +5,15 @@ from slackwolf.db.entities import Channel,\
     User
 from slackwolf.db.entities.game import GameStatus
 
+mock_payload = {
+    'team_id': "mock-team-id",
+    'team_domain': "Mock Team",
+    'channel_id': "mock-channel-id",
+    'channel_name': "Mock Channel",
+    'user_id': "mock-user-id",
+    'user_name': "mockuser"
+}
+
 
 def get_mock_channel():
     mock_team = Team(slack_id='mock-team-id',

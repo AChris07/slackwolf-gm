@@ -19,19 +19,10 @@ def start_game(client, data):
 
 @pytest.mark.usefixtures("mock_game_manager")
 class TestJoinGame:
-    data = {
-        'team_id': "mock-team-id",
-        'team_domain': "Mock Team",
-        'channel_id': "mock-channel-id",
-        'channel_name': "Mock Channel",
-        'user_id': "mock-user-id",
-        'user_name': "mockuser"
-    }
-
     def test_game_created(self, client, monkeypatch):
         monkeypatch.setattr(game_manager, "get_game", lambda *_: None)
 
-        rv = join_game(client, self.data)
+        rv = join_game(client, mocks.mock_payload)
 
         assert rv.status_code == 200
         data = rv.get_json()
@@ -39,9 +30,11 @@ class TestJoinGame:
         assert data['text'] == 'Game lobby updated: @mockuser'
 
     def test_game_exists_joined(self, client):
-        data = dict(self.data)
-        data['user_id'] = "mock-user-id-2"
-        data['user_name'] = "mockuser2"
+        data = {
+            **mocks.mock_payload,
+            'user_id': "mock-user-id-2",
+            'user_name': "mockuser2"
+        }
 
         rv = join_game(client, data)
 
@@ -52,7 +45,7 @@ class TestJoinGame:
             '@mockuser,@mockuser2'
 
     def test_user_already_joined(self, client):
-        rv = join_game(client, self.data)
+        rv = join_game(client, mocks.mock_payload)
 
         assert rv.status_code == 200
         data = rv.get_json()
@@ -64,9 +57,11 @@ class TestJoinGame:
         mock_game.status = GameStatus.STARTING_NIGHT
         monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
-        data = dict(self.data)
-        data['user_id'] = "mock-user-id-2"
-        data['user_name'] = "mockuser2"
+        data = {
+            **mocks.mock_payload,
+            'user_id': "mock-user-id-2",
+            'user_name': "mockuser2"
+        }
 
         rv = join_game(client, data)
 
@@ -79,17 +74,8 @@ class TestJoinGame:
 
 @pytest.mark.usefixtures("mock_game_manager")
 class TestLeaveGame:
-    data = {
-        'team_id': "mock-team-id",
-        'team_domain': "Mock Team",
-        'channel_id': "mock-channel-id",
-        'channel_name': "Mock Channel",
-        'user_id': "mock-user-id",
-        'user_name': "mockuser"
-    }
-
     def test_game_left_last(self, client):
-        rv = leave_game(client, self.data)
+        rv = leave_game(client, mocks.mock_payload)
 
         assert rv.status_code == 200
         data = rv.get_json()
@@ -102,7 +88,7 @@ class TestLeaveGame:
         mock_game.users.append(GameUser(user=user))
         monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
-        rv = leave_game(client, self.data)
+        rv = leave_game(client, mocks.mock_payload)
 
         assert rv.status_code == 200
         data = rv.get_json()
@@ -110,9 +96,11 @@ class TestLeaveGame:
         assert data['text'] == 'Game lobby updated: @mockuser2'
 
     def test_game_already_left(self, client):
-        data = dict(self.data)
-        data['user_id'] = "mock-user-id-2"
-        data['user_name'] = "mockuser2"
+        data = {
+            **mocks.mock_payload,
+            'user_id': "mock-user-id-2",
+            'user_name': "mockuser2"
+        }
 
         rv = leave_game(client, data)
 
@@ -127,7 +115,7 @@ class TestLeaveGame:
         mock_game.status = GameStatus.STARTING_NIGHT
         monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
-        rv = leave_game(client, self.data)
+        rv = leave_game(client, mocks.mock_payload)
 
         assert rv.status_code == 200
         data = rv.get_json()
@@ -138,21 +126,12 @@ class TestLeaveGame:
 
 @pytest.mark.usefixtures("mock_game_manager")
 class TestStartGame:
-    data = {
-        'team_id': "mock-team-id",
-        'team_domain': "Mock Team",
-        'channel_id': "mock-channel-id",
-        'channel_name': "Mock Channel",
-        'user_id': "mock-user-id",
-        'user_name': "mockuser"
-    }
-
     def test_game_started(self, client, monkeypatch, mocker):
         mock_game = mocks.get_mock_game()
         monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
         post_message = mocker.patch('slackwolf.api.slack.post_message')
 
-        rv = start_game(client, self.data)
+        rv = start_game(client, mocks.mock_payload)
 
         assert mock_game.status == GameStatus.STARTING_NIGHT
         assert rv.status_code == 200
@@ -167,9 +146,11 @@ class TestStartGame:
                                              )
 
     def test_game_start_without_join(self, client):
-        data = dict(self.data)
-        data['user_id'] = "mock-user-id-2"
-        data['user_name'] = "mockuser2"
+        data = {
+            **mocks.mock_payload,
+            'user_id': "mock-user-id-2",
+            'user_name': "mockuser2"
+        }
 
         rv = start_game(client, data)
 
@@ -182,7 +163,7 @@ class TestStartGame:
     def test_game_start_without_game(self, client, monkeypatch):
         monkeypatch.setattr(game_manager, "get_game", lambda *_: None)
 
-        rv = start_game(client, self.data)
+        rv = start_game(client, mocks.mock_payload)
 
         assert rv.status_code == 200
         data = rv.get_json()
@@ -195,7 +176,7 @@ class TestStartGame:
         mock_game.status = GameStatus.STARTING_NIGHT
         monkeypatch.setattr(game_manager, "get_game", lambda *_: mock_game)
 
-        rv = start_game(client, self.data)
+        rv = start_game(client, mocks.mock_payload)
 
         assert rv.status_code == 200
         data = rv.get_json()
