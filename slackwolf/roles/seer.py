@@ -2,8 +2,7 @@ from .types import TeamTypes, RoleTypes
 from .villager import Villager
 from .utils import get_role_class
 
-from slackwolf.db.entities import Game
-from slackwolf.db.entities.game import GameStatus
+from slackwolf.db.entities.game import Game, GameStatus
 from slackwolf.models.exceptions import RoleCommandException
 
 

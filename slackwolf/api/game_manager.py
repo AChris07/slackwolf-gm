@@ -1,10 +1,15 @@
 from typing import List, Tuple
 import random
 
-from slackwolf.api.dao import ChannelDao, GameDao, TeamDao, UserDao
-from slackwolf.db.entities import Game, GameUser
-from slackwolf.db.entities.game import GameStatus
-from slackwolf.roles import RoleTypes, TeamTypes, Villager, Werewolf
+from slackwolf.api.dao.channel_dao import ChannelDao
+from slackwolf.api.dao.game_dao import GameDao
+from slackwolf.api.dao.team_dao import TeamDao
+from slackwolf.api.dao.user_dao import UserDao
+from slackwolf.db.entities.game import Game, GameStatus
+from slackwolf.db.entities.game_user import GameUser
+from slackwolf.roles.villager import Villager
+from slackwolf.roles.werewolf import Werewolf
+from slackwolf.roles.types import RoleTypes, TeamTypes
 from slackwolf.roles.utils import get_role_class
 
 TeamIdentity = Tuple[str, str]

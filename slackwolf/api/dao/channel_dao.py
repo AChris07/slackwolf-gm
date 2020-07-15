@@ -2,7 +2,8 @@ from typing import List
 
 from .team_dao import TeamDao
 import slackwolf.db as db
-from slackwolf.db.entities import Channel, Team
+from slackwolf.db.entities.channel import Channel
+from slackwolf.db.entities.team import Team
 
 
 class ChannelDao:

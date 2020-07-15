@@ -1,9 +1,9 @@
 from slackwolf.api import game_manager
 from tests import mocks
 
-from slackwolf.db.entities import GameUser
 from slackwolf.db.entities.game import GameStatus
-from slackwolf.roles import RoleTypes
+from slackwolf.db.entities.game_user import GameUser
+from slackwolf.roles.types import RoleTypes
 
 
 class TestGetGame:

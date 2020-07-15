@@ -1,8 +1,10 @@
 from typing import List
 
 import slackwolf.db as db
-from slackwolf.db.entities import Game, GameUser, User
-from slackwolf.roles import RoleTypes
+from slackwolf.db.entities.game import Game
+from slackwolf.db.entities.game_user import GameUser
+from slackwolf.db.entities.user import User
+from slackwolf.roles.types import RoleTypes
 
 
 class GameDao:

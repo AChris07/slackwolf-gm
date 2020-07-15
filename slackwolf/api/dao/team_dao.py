@@ -1,7 +1,7 @@
 from typing import List
 
 import slackwolf.db as db
-from slackwolf.db.entities import Team
+from slackwolf.db.entities.team import Team
 
 
 class TeamDao:

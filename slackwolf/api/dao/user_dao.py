@@ -2,7 +2,8 @@ from typing import List
 
 from .team_dao import TeamDao
 import slackwolf.db as db
-from slackwolf.db.entities import Team, User
+from slackwolf.db.entities.team import Team
+from slackwolf.db.entities.user import User
 
 
 class UserDao:

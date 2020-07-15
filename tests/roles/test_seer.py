@@ -1,8 +1,10 @@
 import pytest
-from slackwolf.db.entities import GameUser, User
 from slackwolf.db.entities.game import GameStatus
+from slackwolf.db.entities.game_user import GameUser
+from slackwolf.db.entities.user import User
 from slackwolf.models.exceptions import RoleCommandException
-from slackwolf.roles import RoleTypes, Seer
+from slackwolf.roles.seer import Seer
+from slackwolf.roles.types import RoleTypes
 from tests import mocks
 
 

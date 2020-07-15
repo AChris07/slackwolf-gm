@@ -1,9 +1,8 @@
-from slackwolf.db.entities import Channel,\
-    Game,\
-    GameUser,\
-    Team,\
-    User
-from slackwolf.db.entities.game import GameStatus
+from slackwolf.db.entities.channel import Channel
+from slackwolf.db.entities.game import Game, GameStatus
+from slackwolf.db.entities.game_user import GameUser
+from slackwolf.db.entities.team import Team
+from slackwolf.db.entities.user import User
 
 mock_payload = {
     'team_id': "mock-team-id",

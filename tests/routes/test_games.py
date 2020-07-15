@@ -1,7 +1,8 @@
 import pytest
 from slackwolf.api import game_manager
-from slackwolf.db.entities import GameUser, User
 from slackwolf.db.entities.game import GameStatus
+from slackwolf.db.entities.game_user import GameUser
+from slackwolf.db.entities.user import User
 from tests import mocks
 
 

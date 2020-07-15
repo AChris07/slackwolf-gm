@@ -2,9 +2,10 @@ import pytest
 
 from slackwolf import create_app
 from slackwolf.api import game_manager, slack
-from slackwolf.db.entities import User, GameUser
 from slackwolf.db.entities.game import GameStatus
-from slackwolf.roles import RoleTypes
+from slackwolf.db.entities.game_user import GameUser
+from slackwolf.db.entities.user import User
+from slackwolf.roles.types import RoleTypes
 from tests import mocks
 
 
@@ -52,10 +53,10 @@ def mock_game_manager(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def mock_daos(mocker):
-    mocker.patch('slackwolf.api.dao.ChannelDao')
-    mocker.patch('slackwolf.api.dao.GameDao')
-    mocker.patch('slackwolf.api.dao.TeamDao')
-    mocker.patch('slackwolf.api.dao.UserDao')
+    mocker.patch('slackwolf.api.dao.channel_dao.ChannelDao')
+    mocker.patch('slackwolf.api.dao.game_dao.GameDao')
+    mocker.patch('slackwolf.api.dao.team_dao.TeamDao')
+    mocker.patch('slackwolf.api.dao.user_dao.UserDao')
 
 
 @pytest.fixture(autouse=True)

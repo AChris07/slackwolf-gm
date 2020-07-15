@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 
 from slackwolf.db import Base
-from slackwolf.roles import RoleTypes
+from slackwolf.roles.types import RoleTypes
 
 
 class GameUser(Base):
