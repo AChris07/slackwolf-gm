@@ -43,13 +43,7 @@ def see():
     else:
         try:
             user_role = get_role_class(game_user.role)
-            is_werewolf = user_role.see(target_username, current_game)
-            if is_werewolf:
-                msg = f"{user_role.name.value}, " \
-                    + f"{target_username} is a Werewolf"
-            else:
-                msg = f"{user_role.name.value}, " \
-                    + f"{target_username} is not a Werewolf"
+            msg = user_role.see(game_user, target_username)
         except RoleCommandException as e:
             msg = str(e)
         except AttributeError:

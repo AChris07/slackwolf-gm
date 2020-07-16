@@ -24,21 +24,21 @@ def get_mock_started_game():
 class TestSeerSee:
     def test_see_werewolf(self):
         mock_game = get_mock_started_game()
-        res = Seer.see('@mocktarget', mock_game)
+        msg = Seer.see(mock_game.users[0], '@mocktarget')
 
-        assert res is True
+        assert msg == 'Seer, @mocktarget is a Werewolf'
 
     def test_see_not_werewolf(self):
         mock_game = get_mock_started_game()
         mock_game.users[1].role = RoleTypes.VILLAGER
-        res = Seer.see('@mocktarget', mock_game)
+        msg = Seer.see(mock_game.users[0], '@mocktarget')
 
-        assert res is False
+        assert msg == 'Seer, @mocktarget is not a Werewolf'
 
     def test_see_invalid_target(self):
         mock_game = get_mock_started_game()
         with pytest.raises(RoleCommandException) as e:
-            assert Seer.see('@mockinvalidtarget', mock_game)
+            assert Seer.see(mock_game.users[0], '@mockinvalidtarget')
 
         assert str(e.value) == 'User @mockinvalidtarget not found'
 
@@ -46,6 +46,6 @@ class TestSeerSee:
         mock_game = get_mock_started_game()
         mock_game.status = GameStatus.DAY
         with pytest.raises(RoleCommandException) as e:
-            assert Seer.see('@mockinvalidtarget', mock_game)
+            assert Seer.see(mock_game.users[0], '@mockinvalidtarget')
 
         assert str(e.value) == 'Can only be used at night!'
